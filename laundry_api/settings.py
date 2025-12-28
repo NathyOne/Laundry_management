@@ -27,6 +27,35 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+#####################
+# settings.py
+AUTH_USER_MODEL = 'accounts.User'
+
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailAuthBackend',  # Custom backend for email auth
+    'django.contrib.auth.backends.ModelBackend',  # Default backend
+]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+# Email settings (for sending credentials)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Or your SMTP server
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your-email@gmail.com'
+EMAIL_HOST_PASSWORD = 'your-password'
+DEFAULT_FROM_EMAIL = 'Laundry Service <noreply@laundryapp.com>'
+#####################
+
 
 # Application definition
 
@@ -37,6 +66,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'api'
 ]
 
@@ -75,8 +105,11 @@ WSGI_APPLICATION = 'laundry_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'Laundry_api',
+        'HOST': 'localhost',
+        'USER': 'root',
+        'PASSWORD': 'root'
     }
 }
 
