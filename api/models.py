@@ -12,12 +12,26 @@ from .managers import CustomUserManager
 class User(AbstractBaseUser):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    # role/type of user: customer, shop_owner, admin
+
+    STATUS_CHOICES = (
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('suspended', 'Suspended'),
+        ('pending', 'Pending Approval'),
+    )
     USER_TYPES = (
         ('customer', 'Customer'),
         ('shop_owner', 'Shop Owner'),
         ('admin', 'Admin'),
     )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
+
     user_type = models.CharField(max_length=20, choices=USER_TYPES, default='customer')
     phone = models.CharField(max_length=20, blank=True)
     date_joined = models.DateTimeField(auto_now_add=True, null=True)
@@ -27,7 +41,6 @@ class User(AbstractBaseUser):
         db_index=True
     )
 
-    #status
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -74,7 +87,6 @@ class Shop(models.Model):
         ('closed', 'Closed'),
     )
     
-    # Shop Info
     name = models.CharField(_('shop name'), max_length=200)
     description = models.TextField(_('description'), blank=True)
     status = models.CharField(
@@ -84,7 +96,7 @@ class Shop(models.Model):
         default='pending'
     )
     
-    # Shop Owner (created by admin)
+    
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -92,17 +104,14 @@ class Shop(models.Model):
         limit_choices_to={'user_type': 'shop_owner'}
     )
     
-    # Contact Information
     email = models.EmailField(_('shop email'), max_length=254)
     phone = models.CharField(_('shop phone'), max_length=20)
     
-    # Address & Location
     address = models.TextField(_('full address'))
     city = models.CharField(_('city'), max_length=100, default='Addis Ababa')
     region = models.CharField(_('region'), max_length=100, default='Addis Ababa')
     country = models.CharField(_('country'), max_length=100, default='Ethiopia')
     
-    # Coordinates for distance calculation
     latitude = models.DecimalField(
         max_digits=22, 
         decimal_places=16,
@@ -116,12 +125,10 @@ class Shop(models.Model):
         blank=True
     )
     
-    # Shop Details
     opening_hours = models.CharField(_('opening hours'), max_length=200, default='9:00 AM - 8:00 PM')
     delivery_available = models.BooleanField(_('delivery available'), default=False)
     pickup_available = models.BooleanField(_('pickup available'), default=True)
     
-    # Ratings
     average_rating = models.DecimalField(
         max_digits=3,
         decimal_places=2,
@@ -130,7 +137,6 @@ class Shop(models.Model):
     )
     total_reviews = models.PositiveIntegerField(default=0)
     
-    # Images
     logo = models.ImageField(
         _('shop logo'),
         upload_to='shop_logos/',
@@ -144,7 +150,6 @@ class Shop(models.Model):
         null=True
     )
     
-    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     approved_at = models.DateTimeField(null=True, blank=True)
