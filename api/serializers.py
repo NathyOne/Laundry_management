@@ -1,12 +1,8 @@
 from rest_framework import serializers
-from .models import Shop, Owner
-from rest_framework import serializers
+from .models import Shop
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.validators import UniqueValidator
-from rest_framework import serializers
-from django.contrib.auth import get_user_model
-from .models import Shop
 import math
 
 User = get_user_model()
@@ -96,14 +92,14 @@ class ShopSerializer(serializers.ModelSerializer):
             'id', 'name', 'description', 'status', 'owner_name', 'owner_email',
             'email', 'phone', 'address', 'city', 'region', 'country',
             'latitude', 'longitude', 'opening_hours', 'delivery_available',
-            'pickup_available', 'base_wash_price', 'average_rating',
+            'pickup_available', 'average_rating',
             'total_reviews', 'logo', 'banner_image', 'distance',
             'created_at', 'is_active'
         ]
         read_only_fields = ['average_rating', 'total_reviews', 'created_at']
     
     def get_owner_name(self, obj):
-        return obj.owner.full_name if obj.owner else ''
+        return obj.owner.email if obj.owner else ''
     
     def get_distance(self, obj):
         """Calculate distance if user coordinates provided"""
@@ -149,7 +145,7 @@ class ShopCreateSerializer(serializers.ModelSerializer):
             'name', 'description', 'owner_email',
             'email', 'phone', 'address', 'city', 'region', 'country',
             'latitude', 'longitude', 'opening_hours', 'delivery_available',
-            'pickup_available', 'base_wash_price', 'logo', 'banner_image'
+            'pickup_available', 'logo', 'banner_image'
         ]
     
     def validate_owner_email(self, value):
@@ -160,8 +156,8 @@ class ShopCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("No shop owner found with this email")
         
         # Check if shop owner already has a shop
-        if hasattr(owner, 'shop'):
-            raise serializers.ValidationError("This shop owner already has a shop")
+        # if hasattr(owner, 'shop'):
+        #     raise serializers.ValidationError("This shop owner already has a shop")
         
         return value
     

@@ -29,10 +29,10 @@ ALLOWED_HOSTS = []
 
 #####################
 # settings.py
-AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = 'api.User'
 
 AUTHENTICATION_BACKENDS = [
-    'accounts.backends.EmailAuthBackend',  # Custom backend for email auth
+    'api.backends.EmailAuthBackend',  # Custom backend for email auth
     'django.contrib.auth.backends.ModelBackend',  # Default backend
 ]
 
@@ -67,7 +67,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'api'
+
 ]
 
 MIDDLEWARE = [

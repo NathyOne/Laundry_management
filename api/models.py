@@ -12,6 +12,15 @@ from .managers import CustomUserManager
 class User(AbstractBaseUser):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
+    # role/type of user: customer, shop_owner, admin
+    USER_TYPES = (
+        ('customer', 'Customer'),
+        ('shop_owner', 'Shop Owner'),
+        ('admin', 'Admin'),
+    )
+    user_type = models.CharField(max_length=20, choices=USER_TYPES, default='customer')
+    phone = models.CharField(max_length=20, blank=True)
+    date_joined = models.DateTimeField(auto_now_add=True, null=True)
     email = models.EmailField(
         unique=True,  
         max_length=254,
@@ -30,16 +39,29 @@ class User(AbstractBaseUser):
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
 
+    def has_perm(self, perm, obj=None):
+        """Return True if user has a specific permission.
 
-class Owner(models.Model):
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    email = models.EmailField(max_length=254)
-    password = models.CharField(max_length=50)
-    username = models.CharField(max_length=50)
+        Keep this simple: grant permissions to staff or superusers.
+        """
+        return self.is_active and (self.is_superuser or self.is_staff)
 
-    def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+    def has_module_perms(self, app_label):
+        """Return True if user has permissions for the given app label."""
+        return self.is_active and (self.is_superuser or self.is_staff)
+
+    @property
+    def is_admin(self):
+        """Convenience property used across the codebase/permissions."""
+        return self.is_active and (self.user_type == 'admin' or self.is_superuser)
+
+    @property
+    def is_shop_owner(self):
+        return self.is_active and self.user_type == 'shop_owner'
+
+    @property
+    def is_customer(self):
+        return self.is_active and self.user_type == 'customer'
 
 
 
@@ -63,7 +85,7 @@ class Shop(models.Model):
     )
     
     # Shop Owner (created by admin)
-    owner = models.OneToOneField(
+    owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='shop',
@@ -98,14 +120,6 @@ class Shop(models.Model):
     opening_hours = models.CharField(_('opening hours'), max_length=200, default='9:00 AM - 8:00 PM')
     delivery_available = models.BooleanField(_('delivery available'), default=False)
     pickup_available = models.BooleanField(_('pickup available'), default=True)
-    
-    # Pricing (example fields)
-    base_wash_price = models.DecimalField(
-        _('base wash price'),
-        max_digits=10,
-        decimal_places=2,
-        default=100.00
-    )
     
     # Ratings
     average_rating = models.DecimalField(
