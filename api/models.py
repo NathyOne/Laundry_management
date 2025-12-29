@@ -87,7 +87,7 @@ class Shop(models.Model):
         ('closed', 'Closed'),
     )
     
-    name = models.CharField(_('shop name'), max_length=200)
+    name = models.CharField(_('shop name'), max_length=200, unique=True)
     description = models.TextField(_('description'), blank=True)
     status = models.CharField(
         _('status'),

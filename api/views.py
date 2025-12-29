@@ -31,6 +31,7 @@ from .serializers import (
 )
 from .permissions import IsAdminUser
 from rest_framework import generics, permissions, status, filters
+from rest_framework.viewsets import ModelViewSet
 from django.db.models import Q
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
@@ -159,7 +160,7 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
 
 
 ###################################################################################################
-###################################################################################################
+
 
 class ShopListView(generics.ListAPIView):
     """List all active shops (public)"""
@@ -276,26 +277,18 @@ class AdminShopCreateView(generics.CreateAPIView):
             status=status.HTTP_201_CREATED
         )
 
-class ShopOwnerShopView(generics.RetrieveUpdateAPIView):
-    """Shop owner views/updates their own shop"""
-    serializer_class = ShopCreateSerializer
+class ShopOwnerShopView(generics.ListAPIView):
+    """Shop owner lists their own shops"""
+    serializer_class = ShopSerializer
     permission_classes = [IsShopOwner]
-    
-    def get_object(self):
-        # Get shop owned by the current user
-        try:
-            return self.request.user.shop
-        except Shop.DoesNotExist:
-            return None
-    
-    def get(self, request, *args, **kwargs):
-        shop = self.get_object()
-        if not shop:
-            return Response(
-                {'error': 'You do not have a shop yet. Contact admin.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Shop.objects.filter(owner=self.request.user)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
 
 class AdminShopManagementView(generics.ListAPIView):
     """Admin views all shops (including pending)"""

@@ -82,14 +82,14 @@ User = get_user_model()
 
 class ShopSerializer(serializers.ModelSerializer):
     """Shop serializer for listing/details"""
-    owner_name = serializers.SerializerMethodField()
-    owner_email = serializers.CharField(source='owner.email', read_only=True)
+    # owner_name = serializers.SerializerMethodField()
+    # owner_email = serializers.CharField(source='owner.email', read_only=True)
     distance = serializers.SerializerMethodField()
     
     class Meta:
         model = Shop
         fields = [
-            'id', 'name', 'description', 'status', 'owner_name', 'owner_email',
+            'id', 'name', 'description', 'status', 'owner',
             'email', 'phone', 'address', 'city', 'region', 'country',
             'latitude', 'longitude', 'opening_hours', 'delivery_available',
             'pickup_available', 'average_rating',
@@ -98,8 +98,8 @@ class ShopSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['average_rating', 'total_reviews', 'created_at']
     
-    def get_owner_name(self, obj):
-        return obj.owner.email if obj.owner else ''
+    # def get_owner_name(self, obj):
+    #     return obj.owner
     
     def get_distance(self, obj):
         """Calculate distance if user coordinates provided"""
