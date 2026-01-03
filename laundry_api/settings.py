@@ -114,15 +114,15 @@ WSGI_APPLICATION = 'laundry_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Laundry_api',
-        'HOST': 'localhost',
-        'USER': 'root',
-        'PASSWORD': 'root'
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'Laundry_api',
+#         'HOST': 'localhost',
+#         'USER': 'root',
+#         'PASSWORD': 'root'
+#     }
+# }
 
 DATABASES = {
     "default": {
